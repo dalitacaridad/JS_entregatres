@@ -159,7 +159,7 @@ function agregarAlCarrito(e) {
     serviciosEnCarrito[index].cantidad++;
     } else {
     servicioAgregado.cantidad = 1;
-    serviciosEnCarrito.push(servicioAgregado); // Cambié 'servicios' a 'servicioAgregado'
+    serviciosEnCarrito.push(servicioAgregado); 
 }
     actualizarNumber();
     localStorage.setItem("servicios-en-carrito", JSON.stringify(serviciosEnCarrito));
