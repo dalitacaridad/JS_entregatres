@@ -55,24 +55,3 @@ closeModal.addEventListener("click", function () {
     modal.style.display = "none";
     window.location.href = "./index.html"; 
 });
-
-const btn = document.getElementById('button');
-const modalMessage = document.getElementById('modalMessage');
-
-document.getElementById('form')
-    .addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        btn.value = 'Enviando...';
-
-        const serviceID = 'default_service';
-        const templateID = 'Curso de JS - Coder';
-
-        emailjs.sendForm(serviceID, templateID, this)
-            .then(() => {
-                btn.value = 'Enviar correo';
-            }, (err) => {
-                btn.value = 'Enviar correo';
-                alert = 'Error al enviar el mensaje: ' + JSON.stringify(err);
-            });
-    });

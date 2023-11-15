@@ -168,6 +168,10 @@ a {
     margin-bottom: 2rem;
 }
 
+.helperText {
+    color: #000; /* Color negro */
+}
+  
 .contenedor-servicios {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -323,12 +327,13 @@ a {
 }
 
 #paypal-button-container {
-    max-width: 1rem
+    max-width: 600px; 
+    margin: auto; 
 }
 
 
 .formulario {
-    max-width: 400px; 
+    max-width: 500px; 
     margin: 0 auto; 
     display: flex;
     flex-direction: column; 

@@ -13,6 +13,7 @@ const botonComprar = document.querySelector("#carrito-acciones-comprar");
 
 
 
+
 function cargarServiciosCarrito() {
     if (serviciosEnCarrito && serviciosEnCarrito.length > 0) {
 
@@ -20,11 +21,11 @@ function cargarServiciosCarrito() {
         contenedorCarritoServicios.classList.remove("disabled");
         contenedorCarritoAcciones.classList.remove("disabled");
         contenedorCarritoComprado.classList.add("disabled");
-    
+
         contenedorCarritoServicios.innerHTML = "";
-    
+
         serviciosEnCarrito.forEach(servicio => {
-    
+
             const div = document.createElement("div");
             div.classList.add("carrito-servicio");
             div.innerHTML = `
@@ -47,10 +48,10 @@ function cargarServiciosCarrito() {
                 </div>
                 <button class="carrito-servicio-eliminar" id="${servicio.id}"><i class="bi bi-trash-fill"></i></button>
             `;
-    
+
             contenedorCarritoServicios.append(div);
         })
-    
+
     } else {
         contenedorCarritoVacio.classList.remove("disabled");
         contenedorCarritoServicios.classList.add("disabled");
@@ -72,20 +73,20 @@ function actualizarBotonesEliminar() {
 }
 
 function eliminarDelCarrito(e) {
-    const idBoton = e.currentTarget.id; 
+    const idBoton = e.currentTarget.id;
     const index = serviciosEnCarrito.findIndex(servicio => servicio.id === idBoton);
 
     serviciosEnCarrito.splice(index, 1);
     cargarServiciosCarrito();
 
-    localStorage.setItem("servicios-en-carrito", JSON.stringify (serviciosEnCarrito))
+    localStorage.setItem("servicios-en-carrito", JSON.stringify(serviciosEnCarrito))
 }
 
 botonVaciar.addEventListener("click", vaciarCarrito);
 function vaciarCarrito() {
 
-    serviciosEnCarrito.length = 0; 
-    localStorage.setItem("servicios-en-carrito", JSON.stringify (serviciosEnCarrito))
+    serviciosEnCarrito.length = 0;
+    localStorage.setItem("servicios-en-carrito", JSON.stringify(serviciosEnCarrito))
     cargarServiciosCarrito();
 }
 
@@ -100,10 +101,39 @@ function comprarCarrito() {
 
     serviciosEnCarrito.length = 0;
     localStorage.setItem("servicios-en-carrito", JSON.stringify(serviciosEnCarrito));
-    
+
     contenedorCarritoVacio.classList.add("disabled");
     contenedorCarritoServicios.classList.add("disabled");
     contenedorCarritoAcciones.classList.add("disabled");
     contenedorCarritoComprado.classList.remove("disabled");
 
 }
+
+function inicializarBotonPayPal() {
+    paypal.Buttons({
+        createOrder: function (data, actions) {
+            // Configura la transacción con los productos en el carrito
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: serviciosEnCarrito.reduce((total, servicio) => total + (servicio.precio * servicio.cantidad), 0)
+                    }
+                }]
+            });
+        },
+        onApprove: function (data, actions) {
+            // Captura la transacción cuando se aprueba
+            return actions.order.capture().then(function (details) {
+                // Realiza acciones adicionales después de la captura
+                console.log('Pago completado por ' + details.payer.name.given_name);
+                // Puedes limpiar el carrito o realizar otras acciones necesarias
+                serviciosEnCarrito.length = 0;
+                localStorage.setItem("servicios-en-carrito", JSON.stringify(serviciosEnCarrito));
+                cargarServiciosCarrito();
+            });
+        }
+    }).render('#paypal-button-container');
+}
+
+// Llama a la función para inicializar el botón de PayPal
+inicializarBotonPayPal();

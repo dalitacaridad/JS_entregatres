@@ -13,6 +13,9 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+        <script src="https://www.paypal.com/sdk/js?client-id=AdN4-If8zd5JXAqtveBycgmY5Gqbjp-27Gl9IBskCL_lLqhG78FlpNbCZlikzI8O8jzTuIdIW8Lclp2h"></script>
+
+    </head>
 <body>
 
     <i class="bi bi-list mobile-nav-toggle d-xl-none"></i>
@@ -39,7 +42,8 @@
     </div>
 </header>
 <main id="main">
-    <h2 class="titulo-principal">Carrito</h2>
+    <h1 class="titulo-principal">Carrito</h2>
+        <p class="helperText">Para mayor comodididad, puedes seleccionar nuestra pasarela de pago o pagar mediante PAYPAL o tu tarjeta favorita</p>
     <div class="contenedor-carrito">
                 <p id="carrito-vacio" class="carrito-vacio">Tu carrito está vacío. ¡Por ahora! <i class="bi bi-emoji-frown"></i></p>
 
@@ -58,7 +62,7 @@
                         <button id="carrito-acciones-comprar" class="carrito-acciones-comprar">Comprar ahora</button>
                     </div>
                 </div>
-
+                <div id="paypal-button-container"></div>
                 <p id="carrito-comprado" class="carrito-comprado disabled">¡Muchas gracias por tu confianza en mis servicios!<i class="bi bi-emoji-laughing"></i></p>
             </div>
     </div>
