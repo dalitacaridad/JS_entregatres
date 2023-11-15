@@ -73,7 +73,7 @@ const servicios = [
     {
         id: "008",
         titulo: "Videobook",
-        imagen: "./img/7.jpg",
+        imagen: "./img/8.jpg",
         categoria: {
             nombre: "videos",
             id: "videos"
@@ -159,7 +159,7 @@ function agregarAlCarrito(e) {
     serviciosEnCarrito[index].cantidad++;
     } else {
     servicioAgregado.cantidad = 1;
-    serviciosEnCarrito.push(servicioAgregado); 
+    serviciosEnCarrito.push(servicioAgregado); // Cambié 'servicios' a 'servicioAgregado'
 }
     actualizarNumber();
     localStorage.setItem("servicios-en-carrito", JSON.stringify(serviciosEnCarrito));
@@ -170,4 +170,5 @@ function actualizarNumber() {
     number.innerText = nuevoNumber;
 }
 
+// Cargar los servicios al principio
 cargarServicios(servicios);

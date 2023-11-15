@@ -11,6 +11,8 @@ const contenedorTotal = document.querySelector("#total");
 const botonComprar = document.querySelector("#carrito-acciones-comprar");
 
 
+
+
 function cargarServiciosCarrito() {
     if (serviciosEnCarrito && serviciosEnCarrito.length > 0) {
 
