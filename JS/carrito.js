@@ -112,7 +112,6 @@ function comprarCarrito() {
 function inicializarBotonPayPal() {
     paypal.Buttons({
         createOrder: function (data, actions) {
-            // Configura la transacción con los productos en el carrito
             return actions.order.create({
                 purchase_units: [{
                     amount: {
@@ -122,11 +121,8 @@ function inicializarBotonPayPal() {
             });
         },
         onApprove: function (data, actions) {
-            // Captura la transacción cuando se aprueba
             return actions.order.capture().then(function (details) {
-                // Realiza acciones adicionales después de la captura
                 console.log('Pago completado por ' + details.payer.name.given_name);
-                // Puedes limpiar el carrito o realizar otras acciones necesarias
                 serviciosEnCarrito.length = 0;
                 localStorage.setItem("servicios-en-carrito", JSON.stringify(serviciosEnCarrito));
                 cargarServiciosCarrito();
