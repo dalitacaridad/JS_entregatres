@@ -170,5 +170,4 @@ function actualizarNumber() {
     number.innerText = nuevoNumber;
 }
 
-// Cargar los servicios al principio
 cargarServicios(servicios);
