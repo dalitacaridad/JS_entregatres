@@ -6,10 +6,10 @@ Swal.fire({
     imageHeight: 225,
     imageAlt: "",
     customClass: {
-        confirmButton: 'mi-boton-custom' // Clase personalizada para el botón
+        confirmButton: 'mi-boton-custom' 
     },
     buttonsStyling: false,
     showCancelButton: false,
     confirmButtonText: 'Aceptar',
-    confirmButtonColor: 'var(--clr-main)' // Establece el color de fondo del botón
+    confirmButtonColor: 'var(--clr-main)' 
 });
