@@ -131,5 +131,4 @@ function inicializarBotonPayPal() {
     }).render('#paypal-button-container');
 }
 
-// Llama a la función para inicializar el botón de PayPal
 inicializarBotonPayPal();
