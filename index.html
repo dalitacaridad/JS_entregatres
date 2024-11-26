@@ -84,34 +84,6 @@
       background: rgba(0, 0, 0, 0.5);
       z-index: 999;
     }
-
-    /* Media Queries */
-    @media (max-width: 768px) { /* Tablet */
-      body {
-        font-size: 16px;
-      }
-      .modal {
-        width: 85%;
-        max-width: 350px;
-      }
-    }
-
-    @media (max-width: 480px) { /* Mobile */
-      body {
-        font-size: 14px;
-      }
-      .modal {
-        width: 95%;
-        padding: 15px;
-      }
-      .modal-header {
-        font-size: 1.2rem;
-      }
-      .modal button {
-        font-size: 14px;
-        padding: 8px 16px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -119,7 +91,7 @@
     <h1>Prueba de Ventana Modal</h1>
     <p>Esta es una página de prueba para verificar el comportamiento del foco con una ventana modal.</p>
   </header>
-  <main>
+  <main id="main-content">
     <p><a href="#">Enlace 1</a></p>
     <p><a href="#">Enlace 2</a></p>
     <button id="open-modal">Abrir Modal</button>
@@ -131,7 +103,7 @@
     <button class="close-btn" id="close-modal-icon" aria-label="Cerrar Modal">×</button>
     <div class="modal-header" id="modal-header">Encabezado de Modal</div>
     <p>Esta es una ventana modal. Usa el botón para cerrarla.</p>
-    <button id="close-modal">Aceptar</button>
+    <button id="close-modal">Cerrar Modal</button>
   </div>
 
   <script>
@@ -140,15 +112,26 @@
     const closeModalIcon = document.getElementById('close-modal-icon');
     const modal = document.getElementById('modal');
     const backdrop = document.getElementById('backdrop');
-    const mainContent = document.querySelector('main');
+    const mainContent = document.getElementById('main-content');
+    const focusableElementsString = 'a, button, [tabindex]:not([tabindex="-1"])';
+    let focusableElements;
+    let firstFocusableElement;
+    let lastFocusableElement;
 
     // Función para abrir la modal
     function openModal() {
       modal.style.display = 'block';
       backdrop.style.display = 'block';
       modal.setAttribute('aria-hidden', 'false');
+      mainContent.setAttribute('aria-hidden', 'true');
       mainContent.setAttribute('inert', '');
-      closeModalButton.focus();
+
+      // Encontrar elementos focusable dentro de la modal
+      focusableElements = modal.querySelectorAll(focusableElementsString);
+      firstFocusableElement = focusableElements[0];
+      lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+      firstFocusableElement.focus();
     }
 
     // Función para cerrar la modal
@@ -156,8 +139,26 @@
       modal.style.display = 'none';
       backdrop.style.display = 'none';
       modal.setAttribute('aria-hidden', 'true');
+      mainContent.setAttribute('aria-hidden', 'false');
       mainContent.removeAttribute('inert');
       openModalButton.focus();
+    }
+
+    // Atrapando el foco dentro de la modal
+    function trapFocus(event) {
+      if (event.key === 'Tab') {
+        if (event.shiftKey) { // Tab inverso
+          if (document.activeElement === firstFocusableElement) {
+            event.preventDefault();
+            lastFocusableElement.focus();
+          }
+        } else { // Tab normal
+          if (document.activeElement === lastFocusableElement) {
+            event.preventDefault();
+            firstFocusableElement.focus();
+          }
+        }
+      }
     }
 
     // Listeners para abrir y cerrar la modal
@@ -169,6 +170,8 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
         closeModal();
+      } else if (modal.getAttribute('aria-hidden') === 'false') {
+        trapFocus(e); // Atrapamos el foco mientras la modal está abierta
       }
     });
   </script>
