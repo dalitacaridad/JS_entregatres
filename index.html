@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba de Ventana Modal Accesible</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: #000;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    a {
+      color: #EC0000;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    main {
+      padding: 20px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 2px solid #EC0000;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-header {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #EC0000;
+      margin-bottom: 10px;
+    }
+    .modal p {
+      margin: 0 0 20px;
+    }
+    .modal button {
+      background: #EC0000;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal button:hover {
+      background: #cc0000;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      color: #EC0000;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      color: #cc0000;
+    }
+    .backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    /* Media Queries */
+    @media (max-width: 768px) { /* Tablet */
+      body {
+        font-size: 16px;
+      }
+      .modal {
+        width: 85%;
+        max-width: 350px;
+      }
+    }
+
+    @media (max-width: 480px) { /* Mobile */
+      body {
+        font-size: 14px;
+      }
+      .modal {
+        width: 95%;
+        padding: 15px;
+      }
+      .modal-header {
+        font-size: 1.2rem;
+      }
+      .modal button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Prueba de Ventana Modal</h1>
+    <p>Esta es una página de prueba para verificar el comportamiento del foco con una ventana modal.</p>
+  </header>
+  <main>
+    <p><a href="#">Enlace 1</a></p>
+    <p><a href="#">Enlace 2</a></p>
+    <button id="open-modal">Abrir Modal</button>
+  </main>
+
+  <div class="backdrop" id="backdrop"></div>
+
+  <div class="modal" id="modal" role="dialog" aria-labelledby="modal-header" aria-hidden="true">
+    <button class="close-btn" id="close-modal-icon" aria-label="Cerrar Modal">×</button>
+    <div class="modal-header" id="modal-header">Encabezado de Modal</div>
+    <p>Esta es una ventana modal. Usa el botón para cerrarla.</p>
+    <button id="close-modal">Aceptar</button>
+  </div>
+
+  <script>
+    const openModalButton = document.getElementById('open-modal');
+    const closeModalButton = document.getElementById('close-modal');
+    const closeModalIcon = document.getElementById('close-modal-icon');
+    const modal = document.getElementById('modal');
+    const backdrop = document.getElementById('backdrop');
+    const mainContent = document.querySelector('main');
+
+    // Función para abrir la modal
+    function openModal() {
+      modal.style.display = 'block';
+      backdrop.style.display = 'block';
+      modal.setAttribute('aria-hidden', 'false');
+      mainContent.setAttribute('inert', '');
+      closeModalButton.focus();
+    }
+
+    // Función para cerrar la modal
+    function closeModal() {
+      modal.style.display = 'none';
+      backdrop.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      mainContent.removeAttribute('inert');
+      openModalButton.focus();
+    }
+
+    // Listeners para abrir y cerrar la modal
+    openModalButton.addEventListener('click', openModal);
+    closeModalButton.addEventListener('click', closeModal);
+    closeModalIcon.addEventListener('click', closeModal);
+
+    // Cerrar modal al presionar Escape
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
+
