@@ -113,10 +113,6 @@
     const modal = document.getElementById('modal');
     const backdrop = document.getElementById('backdrop');
     const mainContent = document.getElementById('main-content');
-    const focusableElementsString = 'a, button, [tabindex]:not([tabindex="-1"])';
-    let focusableElements;
-    let firstFocusableElement;
-    let lastFocusableElement;
 
     // Función para abrir la modal
     function openModal() {
@@ -124,14 +120,13 @@
       backdrop.style.display = 'block';
       modal.setAttribute('aria-hidden', 'false');
       mainContent.setAttribute('aria-hidden', 'true');
-      mainContent.setAttribute('inert', '');
 
-      // Encontrar elementos focusable dentro de la modal
-      focusableElements = modal.querySelectorAll(focusableElementsString);
-      firstFocusableElement = focusableElements[0];
-      lastFocusableElement = focusableElements[focusableElements.length - 1];
+      // Remover contenido del DOM accesible para TalkBack
+      Array.from(mainContent.children).forEach((child) => {
+        child.setAttribute('aria-hidden', 'true');
+      });
 
-      firstFocusableElement.focus();
+      modal.focus();
     }
 
     // Función para cerrar la modal
@@ -140,25 +135,13 @@
       backdrop.style.display = 'none';
       modal.setAttribute('aria-hidden', 'true');
       mainContent.setAttribute('aria-hidden', 'false');
-      mainContent.removeAttribute('inert');
-      openModalButton.focus();
-    }
 
-    // Atrapando el foco dentro de la modal
-    function trapFocus(event) {
-      if (event.key === 'Tab') {
-        if (event.shiftKey) { // Tab inverso
-          if (document.activeElement === firstFocusableElement) {
-            event.preventDefault();
-            lastFocusableElement.focus();
-          }
-        } else { // Tab normal
-          if (document.activeElement === lastFocusableElement) {
-            event.preventDefault();
-            firstFocusableElement.focus();
-          }
-        }
-      }
+      // Restaurar contenido del DOM accesible para TalkBack
+      Array.from(mainContent.children).forEach((child) => {
+        child.setAttribute('aria-hidden', 'false');
+      });
+
+      openModalButton.focus();
     }
 
     // Listeners para abrir y cerrar la modal
@@ -170,8 +153,6 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
         closeModal();
-      } else if (modal.getAttribute('aria-hidden') === 'false') {
-        trapFocus(e); // Atrapamos el foco mientras la modal está abierta
       }
     });
   </script>
