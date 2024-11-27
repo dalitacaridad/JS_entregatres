@@ -103,50 +103,95 @@
     <button class="close-btn" id="close-modal-icon" aria-label="Cerrar Modal">×</button>
     <div class="modal-header" id="modal-header">Encabezado de Modal</div>
     <p>Esta es una ventana modal. Usa el botón para cerrarla.</p>
-    <button id="close-modal">Aceptar</button>
+    <button id="close-modal">Cerrar Modal</button>
   </div>
 
   <script>
-   function openModal() {
-  // Mover el contenido principal fuera del DOM temporalmente
-  const body = document.body;
-  const mainContent = document.getElementById('main-content');
-  const hiddenDiv = document.createElement('div');
+    const openModalButton = document.getElementById('open-modal');
+    const closeModalButton = document.getElementById('close-modal');
+    const closeModalIcon = document.getElementById('close-modal-icon');
+    const modal = document.getElementById('modal');
+    const backdrop = document.getElementById('backdrop');
+    const mainContent = document.getElementById('main-content');
+    const focusableElementsString = 'button, [tabindex]:not([tabindex="-1"])';
+    let focusableElements;
+    let firstFocusableElement;
+    let lastFocusableElement;
 
-  hiddenDiv.id = 'hidden-div';
-  hiddenDiv.style.display = 'none';
-  body.insertBefore(hiddenDiv, modal);
-  hiddenDiv.appendChild(mainContent);
+    // Función para abrir la modal
+    function openModal() {
+      // Mover el contenido principal fuera del DOM temporalmente
+      const body = document.body;
+      const hiddenDiv = document.createElement('div');
 
-  // Mostrar la modal
-  modal.style.display = 'block';
-  backdrop.style.display = 'block';
-  modal.setAttribute('aria-hidden', 'false');
+      hiddenDiv.id = 'hidden-div';
+      hiddenDiv.style.display = 'none';
+      body.insertBefore(hiddenDiv, modal);
+      hiddenDiv.appendChild(mainContent);
 
-  // Configurar el foco
-  focusableElements = modal.querySelectorAll(focusableElementsString);
-  firstFocusableElement = focusableElements[0];
-  lastFocusableElement = focusableElements[focusableElements.length - 1];
-  firstFocusableElement.focus();
-}
+      // Mostrar la modal
+      modal.style.display = 'block';
+      backdrop.style.display = 'block';
+      modal.setAttribute('aria-hidden', 'false');
 
-function closeModal() {
-  // Restaurar el contenido principal al DOM
-  const hiddenDiv = document.getElementById('hidden-div');
-  const mainContent = hiddenDiv.firstChild;
-  document.body.insertBefore(mainContent, backdrop);
-  hiddenDiv.remove();
+      // Configurar el foco
+      focusableElements = modal.querySelectorAll(focusableElementsString);
+      firstFocusableElement = focusableElements[0];
+      lastFocusableElement = focusableElements[focusableElements.length - 1];
+      firstFocusableElement.focus();
+    }
 
-  // Ocultar la modal
-  modal.style.display = 'none';
-  backdrop.style.display = 'none';
-  modal.setAttribute('aria-hidden', 'true');
+    // Función para cerrar la modal
+    function closeModal() {
+      // Restaurar el contenido principal al DOM
+      const hiddenDiv = document.getElementById('hidden-div');
+      const mainContentRestored = hiddenDiv.firstChild;
+      document.body.insertBefore(mainContentRestored, backdrop);
+      hiddenDiv.remove();
 
-  // Restaurar el foco
-  openModalButton.focus();
-}
+      // Ocultar la modal
+      modal.style.display = 'none';
+      backdrop.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
 
+      // Restaurar el foco
+      openModalButton.focus();
+    }
+
+    // Atrapando el foco dentro de la modal
+    function trapFocus(event) {
+      if (event.key === 'Tab') {
+        if (event.shiftKey) {
+          // Navegación inversa
+          if (document.activeElement === firstFocusableElement) {
+            event.preventDefault();
+            lastFocusableElement.focus();
+          }
+        } else {
+          // Navegación normal
+          if (document.activeElement === lastFocusableElement) {
+            event.preventDefault();
+            firstFocusableElement.focus();
+          }
+        }
+      }
+    }
+
+    // Listeners para abrir y cerrar la modal
+    openModalButton.addEventListener('click', openModal);
+    closeModalButton.addEventListener('click', closeModal);
+    closeModalIcon.addEventListener('click', closeModal);
+
+    // Cerrar modal al presionar Escape
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+        closeModal();
+      } else if (modal.getAttribute('aria-hidden') === 'false') {
+        trapFocus(e);
+      }
+    });
   </script>
 </body>
 </html>
+
 
