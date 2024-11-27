@@ -1,4 +1,4 @@
-r<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -107,97 +107,45 @@ r<!DOCTYPE html>
   </div>
 
   <script>
-    const openModalButton = document.getElementById('open-modal');
-    const closeModalButton = document.getElementById('close-modal');
-    const closeModalIcon = document.getElementById('close-modal-icon');
-    const modal = document.getElementById('modal');
-    const backdrop = document.getElementById('backdrop');
-    const mainContent = document.getElementById('main-content');
-    const focusableElementsString = 'button, [tabindex]:not([tabindex="-1"])';
-    let focusableElements;
-    let firstFocusableElement;
-    let lastFocusableElement;
+   function openModal() {
+  // Mover el contenido principal fuera del DOM temporalmente
+  const body = document.body;
+  const mainContent = document.getElementById('main-content');
+  const hiddenDiv = document.createElement('div');
 
-    // Función para abrir la modal
-    function openModal() {
-      modal.style.display = 'block';
-      backdrop.style.display = 'block';
-      modal.setAttribute('aria-hidden', 'false');
-      mainContent.setAttribute('aria-hidden', 'true');
+  hiddenDiv.id = 'hidden-div';
+  hiddenDiv.style.display = 'none';
+  body.insertBefore(hiddenDiv, modal);
+  hiddenDiv.appendChild(mainContent);
 
-      // Ocultar contenido de fondo para lectores de pantalla
-      Array.from(mainContent.children).forEach((child) => {
-        child.setAttribute('aria-hidden', 'true');
-      });
+  // Mostrar la modal
+  modal.style.display = 'block';
+  backdrop.style.display = 'block';
+  modal.setAttribute('aria-hidden', 'false');
 
-      // Encontrar elementos focusables dentro de la modal
-      focusableElements = modal.querySelectorAll(focusableElementsString);
-      firstFocusableElement = focusableElements[0];
-      lastFocusableElement = focusableElements[focusableElements.length - 1];
+  // Configurar el foco
+  focusableElements = modal.querySelectorAll(focusableElementsString);
+  firstFocusableElement = focusableElements[0];
+  lastFocusableElement = focusableElements[focusableElements.length - 1];
+  firstFocusableElement.focus();
+}
 
-      // Forzar el foco en el primer elemento enfocable de la modal
-      firstFocusableElement.focus();
-    }
+function closeModal() {
+  // Restaurar el contenido principal al DOM
+  const hiddenDiv = document.getElementById('hidden-div');
+  const mainContent = hiddenDiv.firstChild;
+  document.body.insertBefore(mainContent, backdrop);
+  hiddenDiv.remove();
 
-    // Función para cerrar la modal
-    function closeModal() {
-      modal.style.display = 'none';
-      backdrop.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-      mainContent.setAttribute('aria-hidden', 'false');
+  // Ocultar la modal
+  modal.style.display = 'none';
+  backdrop.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
 
-      // Restaurar contenido de fondo accesible para lectores de pantalla
-      Array.from(mainContent.children).forEach((child) => {
-        child.setAttribute('aria-hidden', 'false');
-      });
+  // Restaurar el foco
+  openModalButton.focus();
+}
 
-      // Restaurar el foco al botón de apertura
-      openModalButton.focus();
-    }
-
-    // Atrapando el foco dentro de la modal
-    function trapFocus(event) {
-      if (event.key === 'Tab') {
-        if (event.shiftKey) {
-          // Navegación inversa
-          if (document.activeElement === firstFocusableElement) {
-            event.preventDefault();
-            lastFocusableElement.focus();
-          }
-        } else {
-          // Navegación normal
-          if (document.activeElement === lastFocusableElement) {
-            event.preventDefault();
-            firstFocusableElement.focus();
-          }
-        }
-      }
-    }
-
-    // Prevenir swipes fuera de la modal
-    function preventSwipeOut(event) {
-      const activeElement = document.activeElement;
-      if (!modal.contains(activeElement)) {
-        firstFocusableElement.focus();
-      }
-    }
-
-    // Listeners para abrir y cerrar la modal
-    openModalButton.addEventListener('click', openModal);
-    closeModalButton.addEventListener('click', closeModal);
-    closeModalIcon.addEventListener('click', closeModal);
-
-    // Cerrar modal al presionar Escape
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
-        closeModal();
-      } else if (modal.getAttribute('aria-hidden') === 'false') {
-        trapFocus(e);
-      }
-    });
-
-    // Detectar swipes fuera de la modal con TalkBack
-    modal.addEventListener('focusout', preventSwipeOut);
   </script>
 </body>
 </html>
