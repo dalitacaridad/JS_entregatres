@@ -125,7 +125,7 @@
       modal.setAttribute('aria-hidden', 'false');
       mainContent.setAttribute('aria-hidden', 'true');
 
-      // Remover contenido del DOM accesible para TalkBack
+      // Ocultar contenido de fondo para lectores de pantalla
       Array.from(mainContent.children).forEach((child) => {
         child.setAttribute('aria-hidden', 'true');
       });
@@ -146,7 +146,7 @@
       modal.setAttribute('aria-hidden', 'true');
       mainContent.setAttribute('aria-hidden', 'false');
 
-      // Restaurar contenido del DOM accesible para TalkBack
+      // Restaurar contenido de fondo accesible para lectores de pantalla
       Array.from(mainContent.children).forEach((child) => {
         child.setAttribute('aria-hidden', 'false');
       });
@@ -155,21 +155,30 @@
       openModalButton.focus();
     }
 
-    // Atrapando el foco dentro de la modal con swipes de TalkBack
+    // Atrapando el foco dentro de la modal
     function trapFocus(event) {
-      const { key } = event;
-      if (key === 'Tab') {
+      if (event.key === 'Tab') {
         if (event.shiftKey) {
+          // Navegación inversa
           if (document.activeElement === firstFocusableElement) {
             event.preventDefault();
             lastFocusableElement.focus();
           }
         } else {
+          // Navegación normal
           if (document.activeElement === lastFocusableElement) {
             event.preventDefault();
             firstFocusableElement.focus();
           }
         }
+      }
+    }
+
+    // Prevenir swipes fuera de la modal
+    function preventSwipeOut(event) {
+      const activeElement = document.activeElement;
+      if (!modal.contains(activeElement)) {
+        firstFocusableElement.focus();
       }
     }
 
@@ -187,12 +196,9 @@
       }
     });
 
-    // Gestionar swipes de TalkBack atrapando foco manualmente
-    modal.addEventListener('focusout', (event) => {
-      if (!modal.contains(event.relatedTarget)) {
-        firstFocusableElement.focus();
-      }
-    });
+    // Detectar swipes fuera de la modal con TalkBack
+    modal.addEventListener('focusout', preventSwipeOut);
   </script>
 </body>
 </html>
+
