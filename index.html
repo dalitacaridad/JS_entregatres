@@ -113,6 +113,10 @@
     const modal = document.getElementById('modal');
     const backdrop = document.getElementById('backdrop');
     const mainContent = document.getElementById('main-content');
+    const focusableElementsString = 'button, [tabindex]:not([tabindex="-1"])';
+    let focusableElements;
+    let firstFocusableElement;
+    let lastFocusableElement;
 
     // Función para abrir la modal
     function openModal() {
@@ -126,7 +130,13 @@
         child.setAttribute('aria-hidden', 'true');
       });
 
-      modal.focus();
+      // Encontrar elementos focusables dentro de la modal
+      focusableElements = modal.querySelectorAll(focusableElementsString);
+      firstFocusableElement = focusableElements[0];
+      lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+      // Forzar el foco en el primer elemento enfocable de la modal
+      firstFocusableElement.focus();
     }
 
     // Función para cerrar la modal
@@ -141,7 +151,26 @@
         child.setAttribute('aria-hidden', 'false');
       });
 
+      // Restaurar el foco al botón de apertura
       openModalButton.focus();
+    }
+
+    // Atrapando el foco dentro de la modal con swipes de TalkBack
+    function trapFocus(event) {
+      const { key } = event;
+      if (key === 'Tab') {
+        if (event.shiftKey) {
+          if (document.activeElement === firstFocusableElement) {
+            event.preventDefault();
+            lastFocusableElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastFocusableElement) {
+            event.preventDefault();
+            firstFocusableElement.focus();
+          }
+        }
+      }
     }
 
     // Listeners para abrir y cerrar la modal
@@ -153,9 +182,17 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
         closeModal();
+      } else if (modal.getAttribute('aria-hidden') === 'false') {
+        trapFocus(e);
+      }
+    });
+
+    // Gestionar swipes de TalkBack atrapando foco manualmente
+    modal.addEventListener('focusout', (event) => {
+      if (!modal.contains(event.relatedTarget)) {
+        firstFocusableElement.focus();
       }
     });
   </script>
 </body>
 </html>
-
