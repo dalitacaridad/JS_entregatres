@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modal con &lt;dialog&gt;</title>
+  <title>Prueba de ventana modal accesible</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,18 +13,6 @@
       background-color: #f9f9f9;
       margin: 0;
       padding: 0;
-    }
-    button {
-      background: #EC0000;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #cc0000;
     }
     a {
       color: #EC0000;
@@ -36,26 +24,41 @@
     main {
       padding: 20px;
     }
-    dialog {
-      border: none;
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 2px solid #EC0000;
       border-radius: 8px;
-      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      position: relative;
+      z-index: 1000;
+      padding: 20px;
     }
-    dialog[open]::backdrop {
-      background: rgba(0, 0, 0, 0.5);
-    }
-    .dialog-header {
+    .modal-header {
       font-size: 1.5rem;
       font-weight: bold;
       color: #EC0000;
       margin-bottom: 10px;
     }
-    .dialog-content {
-      margin-bottom: 20px;
+    .modal p {
+      margin: 0 0 20px;
+    }
+    .modal button {
+      background: #EC0000;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal button:hover {
+      background: #cc0000;
     }
     .close-btn {
       position: absolute;
@@ -69,7 +72,17 @@
       cursor: pointer;
     }
     .close-btn:hover {
-      background: rgba(255, 0, 0, 0.1); /* Fondo más claro para que la "X" se mantenga visible */
+      color: #cc0000;
+    }
+    .backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
     }
   </style>
 </head>
@@ -78,50 +91,105 @@
     <h1>Prueba de Ventana Modal</h1>
     <p>Esta es una página de prueba para verificar el comportamiento del foco con una ventana modal.</p>
   </header>
-  <main>
+  <main id="main-content">
     <p><a href="#">Enlace 1</a></p>
     <p><a href="#">Enlace 2</a></p>
-    <button id="open-modal">Abrir Modal</button>
+    <button id="open-modal">Abrir modal</button>
   </main>
 
-  <!-- Modal -->
-  <dialog id="modal" aria-labelledby="dialog-title" aria-modal="true">
-    <button type="button" class="close-btn" aria-label="Cerrar Modal">×</button>
-    <div class="dialog-content">
-      <h2 id="dialog-title" class="dialog-header">Encabezado de Modal</h2>
-      <p>Esta es una ventana modal. Usa el botón para aceptar.</p>
-      <button type="button" id="close-modal">Aceptar</button>
-    </div>
-  </dialog>
+  <div class="backdrop" id="backdrop"></div>
+
+  <div class="modal" id="modal" role="dialog" aria-labelledby="modal-header" aria-hidden="true">
+    <button class="close-btn" id="close-modal-icon" aria-label="Cerrar Modal">×</button>
+    <div class="modal-header" id="modal-header">Encabezado de Modal</div>
+    <p>Esta es una ventana modal. Usa el botón para cerrarla.</p>
+    <button id="close-modal">Aceptar lo que sea</button>
+  </div>
 
   <script>
     const openModalButton = document.getElementById('open-modal');
     const closeModalButton = document.getElementById('close-modal');
+    const closeModalIcon = document.getElementById('close-modal-icon');
     const modal = document.getElementById('modal');
-    const closeButton = document.querySelector('.close-btn');
+    const backdrop = document.getElementById('backdrop');
+    const mainContent = document.getElementById('main-content');
+    const focusableElementsString = 'button, [tabindex]:not([tabindex="-1"])';
+    let focusableElements;
+    let firstFocusableElement;
+    let lastFocusableElement;
 
     // Función para abrir la modal
     function openModal() {
-      modal.showModal();
+      // Mover el contenido principal fuera del DOM temporalmente
+      const body = document.body;
+      const hiddenDiv = document.createElement('div');
+
+      hiddenDiv.id = 'hidden-div';
+      hiddenDiv.style.display = 'none';
+      body.insertBefore(hiddenDiv, modal);
+      hiddenDiv.appendChild(mainContent);
+
+      // Mostrar
+      modal.style.display = 'block';
+      backdrop.style.display = 'block';
+      modal.setAttribute('aria-hidden', 'false');
+
+      // Foco
+      focusableElements = modal.querySelectorAll(focusableElementsString);
+      firstFocusableElement = focusableElements[0];
+      lastFocusableElement = focusableElements[focusableElements.length - 1];
+      firstFocusableElement.focus();
     }
 
     // Función para cerrar la modal
     function closeModal() {
-      modal.close();
+      // Restaurar el contenido principal al DOM
+      const hiddenDiv = document.getElementById('hidden-div');
+      const mainContentRestored = hiddenDiv.firstChild;
+      document.body.insertBefore(mainContentRestored, backdrop);
+      hiddenDiv.remove();
+
+      // Ocultar la modal
+      modal.style.display = 'none';
+      backdrop.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+
+      // Restaurar el foco
+      openModalButton.focus();
+    }
+
+    // Atrapando el foco dentro de la modal
+    function trapFocus(event) {
+      if (event.key === 'Tab') {
+        if (event.shiftKey) {
+          // Navegación inversa
+          if (document.activeElement === firstFocusableElement) {
+            event.preventDefault();
+            lastFocusableElement.focus();
+          }
+        } else {
+          // Navegación normal
+          if (document.activeElement === lastFocusableElement) {
+            event.preventDefault();
+            firstFocusableElement.focus();
+          }
+        }
+      }
     }
 
     // Listeners para abrir y cerrar la modal
     openModalButton.addEventListener('click', openModal);
     closeModalButton.addEventListener('click', closeModal);
-    closeButton.addEventListener('click', closeModal);
+    closeModalIcon.addEventListener('click', closeModal);
 
     // Cerrar modal al presionar Escape
-    modal.addEventListener('cancel', (event) => {
-      event.preventDefault(); // Evita el cierre por defecto de `cancel`
-      closeModal();
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+        closeModal();
+      } else if (modal.getAttribute('aria-hidden') === 'false') {
+        trapFocus(e);
+      }
     });
   </script>
 </body>
 </html>
-
-
